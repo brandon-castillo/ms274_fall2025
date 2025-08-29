@@ -6,6 +6,9 @@ __pycache__/
 # Mac specific 
 .DS_Store
 
+#NetCDF Files
+*.nc
+
 # C extensions
 *.so
 
