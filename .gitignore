@@ -3,6 +3,9 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# MITgcm folder
+MITgcm/
+
 # Mac specific 
 .DS_Store
 
