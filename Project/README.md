@@ -5,17 +5,12 @@ In this project, I will investigate the heat transport in the Davis Strait at tw
 
 *How does the change capturing higher resolution features in the Davis Strait impact heat transport?*
 
-To investigate this question, I will construct 2 models spanning the Davis Strait at differing resolutions. I will run my experiment during the year 2008, which would be interesting taking place after the 2007 arctic sea ice minimum. I anticipate that resulting data will have some significant differences between the resolution levels due to the higher resolution model missing a lot of the smaller scale features that have significant impacts on the ocean in this region. 
+To investigate this question, I will construct 2 models spanning the Davis Strait at differing resolutions. I will run my experiment during the year 1997. The reason to use 1997 is this was the year before sea ice melt dramatically increased, thus being a more "normal" year of Arctic data to use and compare against my model results. 
 
-For initial conditions, I will use the state of the ECCO Version 5 Model in January of 2008. Similarly, I will construct boundary and external forcing conditions for this model from the ECCO Version 5 model output. To analyze the results, I will particularly focus on Theta and heat flux charts, comparing these results through a time series going through a year of data. I will also create a movie capturing how these variables change over time between the resolution levels. 
-
-(WIP: Keeping boilerplate for now, will update as model progresses) 
+For initial conditions, I will use the state of the ECCO Version 4 Model in January of 1997 and 1998. Similarly, I will construct boundary and external forcing conditions for this model from the ECCO Version 4 model output. To analyze the results, I will particularly focus on Theta, Sea Ice, and heat flux charts, comparing these results through a time series going through a year of data. I will also create a movie capturing how these variables change over time between the resolution levels. 
 
 ## Reproducing Model Results
-
-*Note for MS274: The following section outlines possible steps that may be included in your README for reproducibility. When designing your own steps, be sure to consider which of the steps below pertain to your model and update/modify accordingly.*
-
-The following steps outline how to construct the model files, configure and run the model, and assess the model results.
+The following steps outline how to construct the model files, configure and run the model, and assess the model results. As I am running two different model resolution levels, the same steps will need to be repeated between the low resolution and high resolution folders.
 
 ### Step 1: Create the Model Files
 Several input files need to be created to run the model. Generate the following list of files using the notebooks indicated in paratheses:
@@ -29,33 +24,43 @@ The model files should be placed into the  `input` directory.
 ### Step 2: Add files to the computing cluster
 Once the input files have been created, the model files can be transferred to the computing cluster. Begin by cloning a copy of [MITgcm](https://github.com/MITgcm/MITgcm) into your scratch directory and make a folder for the configuration, .e.g.
 ```
-mkdir MITgcm/configurations/ca_upwelling
+mkdir MITgcm/configurations/davis_strait/low_res
 ```
 Then, use the `scp` command to send the `code`, `input`, and `namelist` directories to your configuration directory. 
 
 ### Step 3: Compile the model
 Once all of the files are on the computing cluster, the model can be compiled. Make a `build` directory in the configuration directory and run the following lines:
 ```
-../../../tools/genmake2 -of ../../../tools/build_options/darwin_amd64_gfortran -mods ../code -mpi
+../../../../tools/genmake2 -of ../../../../tools/build_options/darwin_amd64_gfortran -mods ../code -mpi
 make depend
 make
 ```
 
-### Step 4.1: Run the model with wind
-After the compilation is complete, run the model with the wind. Move to the run directory, link everything from `input` and `code`, and the submit the job script:
+### Step 4.1: running the low_res model 
+After the compilation is complete, run the model with the wind. Move to the run directory, link everything from `input` and `namelist`, and the submit the job script:
 ```
-sbatch mwood.slm
+sbatch bcastillo.slm
 ```
 
-### Step 4.2: Run the model without wind
-Next, run the model without wind to complete the experiment. Again, link everything from `input` and `code` to a directory called `run_no_wind`. Then, edit the `data.exf` file to point to the modified wind files (see the Creating the External Forcing Conditions.ipynb notebook for details). Then, submit the job script again to rerun the model.
+### Step 4.2: Run the high_res model 
+Steps for high_res are similar, running a similar sbatch script, but due to the resolution level it will require an initialization period with a very low timestep value. For initialization, in the data file:
+```
+deltaT=5.,
+nTimeSteps = 17280,
+```
+This will get the first day of data complete. after this, set the niter0 to the latest pickup and modify data file to be:
+```
+ deltaT=60.,
+ nTimeSteps = 1036800,
+ pChkptFreq=172800.,
+```
 
 ### Step 5: Analyze the Results
 There are two notebooks provided for analysis:
-1. Analyzing Model Results
+1. Compare Observations 
 
-   This notebook is provided to have a quick look at spatial and temporal variations in the temperature field in the model with wind. It also generates the visualization provided in the figures directory.
+   Located in the low_res folder. This notebook provides most of the analysis, including looking at timestep data for theta, heat transport, sea ice, generating movies from these files, and comparing theta results against Davis Mooring observation data. There is also a heat transport comparison against high res model results.
    
-2. Answering the Science Question
+2. high_res_data_analysis
    
-   This notebooks provided some analysis plot to address the science question posed above.
+   This notebook has is essentially some of the timestep analysis and movie creation code from above, except applied to high resolution model results. 
