@@ -37,7 +37,7 @@ make
 ```
 
 ### Step 4.1: running the low_res model 
-After the compilation is complete, run the model with the wind. Move to the run directory, link everything from `input` and `namelist`, and the submit the job script:
+After the compilation is complete, run the model. Move to the run directory, link everything from `input` and `namelist`, and the submit the job script:
 ```
 sbatch bcastillo.slm
 ```
